@@ -24,8 +24,21 @@ public class AppointmentsController(IAppointmentsService _service) : ControllerB
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddAppointmentAsync()
+    public async Task<IActionResult> AddAppointmentAsync([FromBody] PushAppointmentDTO appointment)
     {
-        return Created("/api/appointments/id", null);
+        if(!ModelState.IsValid)
+            return BadRequest(ModelState);
+        try
+        {
+            return Created("/api/appointments/id", "created new appointment");
+        }
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (ConflictException e)
+        {
+            return Conflict(e.Message);
+        }
     }
 }

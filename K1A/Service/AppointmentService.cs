@@ -48,4 +48,38 @@ public class AppointmentService(IConfiguration _configuration) : IAppointmentsSe
         if (appointment == null) throw new NotFoundException("Appointment not found");
         return appointment;
     }
+
+    public async Task AddAppointmentAsync(PushAppointmentDTO appointment)
+    {
+        await using var conn = new SqlConnection(_connectionString);
+        await conn.OpenAsync();
+        var transaction = conn.BeginTransaction();
+        const string cmdText = "";
+        await using var cmd = new SqlCommand(cmdText, conn, transaction);
+        try
+        {
+            var doctorId = 0; // TODO: GetDoctorId
+            cmd.Parameters.Clear();
+            cmd.CommandText = @"INSERT INTO Appointment VALUES (@AppointmentId, @PatientId, @DoctorId,@Date)";
+            cmd.Parameters.AddWithValue("@AppointmentId", appointment.AppointmentId);
+            cmd.Parameters.AddWithValue("@PatientId", appointment.PatientId);
+            cmd.Parameters.AddWithValue("@DoctorId", doctorId);
+            cmd.Parameters.AddWithValue("@Date", DateTime.Now);
+            try
+            {
+                await cmd.ExecuteNonQueryAsync();
+            }
+            catch
+            {
+                throw new ConflictException("Appointment already exists");
+            }
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
 }
