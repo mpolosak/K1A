@@ -3,5 +3,5 @@
 public class AppointmentServiceDTO
 {
     public string Name {get; set;}
-    public double ServiceFee {get; set;}
+    public decimal ServiceFee {get; set;}
 }

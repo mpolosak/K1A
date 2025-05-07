@@ -1,4 +1,5 @@
 ﻿using K1A.DTOs;
+using K1A.Exceptions;
 using K1A.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,8 +12,15 @@ public class AppointmentsController(IAppointmentsService _service) : ControllerB
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAppointmentAsync(int id)
     {
-        AppointmentDTO appointment = await _service.GetAppointmentAsync(id);
-        return Ok(appointment);
+        try
+        {
+            var appointment = await _service.GetAppointmentAsync(id);
+            return Ok(appointment);
+        }
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
     }
 
     [HttpPost]
