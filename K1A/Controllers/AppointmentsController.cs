@@ -1,15 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using K1A.DTOs;
+using K1A.Service;
+using Microsoft.AspNetCore.Mvc;
 
 namespace K1A.Controllers;
 
 [ApiController]
 [Route("/api/[controller]")]
-public class AppointmentsController : ControllerBase
+public class AppointmentsController(IAppointmentsService _service) : ControllerBase
 {
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAppointmentAsync(int id)
     {
-        return Ok(id);
+        AppointmentDTO appointment = await _service.GetAppointmentAsync(id);
+        return Ok(appointment);
     }
 
     [HttpPost]
